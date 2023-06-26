@@ -7,8 +7,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-import "hardhat/console.sol";
-
 contract Ticket is ERC721, Ownable {
     using Counters for Counters.Counter;
 
@@ -18,9 +16,9 @@ contract Ticket is ERC721, Ownable {
     mapping(address => uint256) private amountOfTickets;
     address[20] private topPlayers;
 
-    string private baseUri = "https://veritty-backend.herokuapp.com/metadata/";
+    string private baseUri = "https://veritty-backend-polygon-app.herokuapp.com/metadata/";
 
-    constructor(uint256[] memory _tokenIds, uint256[] memory _sums) ERC721("VERITTY Ticket", "VRT") {
+    constructor(uint256[] memory _tokenIds, uint256[] memory _sums) ERC721("VERITTY - NFT LOTTERY", "VRT") {
         require(_tokenIds.length == _sums.length, "Ticket: invalid arguments");
 
         uint256 length = _tokenIds.length;
@@ -29,7 +27,7 @@ contract Ticket is ERC721, Ownable {
         }
     }
 
-    function mint(address _to, uint256 _sum) public returns (uint256) {
+    function mint(address _to, uint256 _sum) public onlyOwner returns (uint256) {
         uint256 tokenId = tokenIds[_sum]++;
         _mint(_to, tokenId);
 
