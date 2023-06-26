@@ -3,9 +3,8 @@ pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import "./interfaces/Raffle.sol";
+import "./Raffle.sol";
 import "./Ticket.sol";
-import "hardhat/console.sol";
 
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -13,7 +12,7 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 contract RaffleImpl is Ownable, Raffle, VRFConsumerBaseV2 {
     /* Raffle Variables */
     Ticket public immutable ticketNft;
-    uint256 public entranceFee = 0.033 ether;
+    uint256 public entranceFee = 55.0 ether;
     uint256 public ticketsLeft;
     uint256 private ticketsLeftToFulfill;
     uint256[] private amounts;
@@ -28,7 +27,7 @@ contract RaffleImpl is Ownable, Raffle, VRFConsumerBaseV2 {
     VRFCoordinatorV2Interface private vrfCoordinator;
     uint32 public constant numWords = 1;
     uint16 public immutable requestConfirmations;
-    uint32 public constant callbackGasLimit = 400000;
+    uint32 public constant callbackGasLimit = 600000;
     bytes32 public keyHash;
     uint64 public subscriptionId;
     mapping (uint256 => address) public playerByRequestId;
@@ -68,8 +67,8 @@ contract RaffleImpl is Ownable, Raffle, VRFConsumerBaseV2 {
 
         amounts = _amounts;
 
-        ticketsLeft = 12000;
-        ticketsLeftToFulfill = 12000;
+        ticketsLeft = 11999;
+        ticketsLeftToFulfill = 11999;
 
         ticketNft = Ticket(_ticketNft);
     }
@@ -103,6 +102,7 @@ contract RaffleImpl is Ownable, Raffle, VRFConsumerBaseV2 {
     }
 
     function setReffererShare(uint256 newShare) external onlyOwner {
+        require (newShare < FLOOR, "RaffleImpl: too big share");
         reffererShare = newShare;
     }
 
@@ -128,17 +128,20 @@ contract RaffleImpl is Ownable, Raffle, VRFConsumerBaseV2 {
     }
 
     function enterRaffle(address refferer) external payable override opened {
-        require(msg.value >= entranceFee, "Raffle: not enough ether sent");
-        require(ticketsLeft > 0, "Raffle: All positions are closed");
+        require(msg.value >= entranceFee, "RaffleImpl: not enough ether sent");
+        require(ticketsLeft > 0, "RaffleImpl: All positions are closed");
+        require(refferer != msg.sender, "RaffleImpl: Refferer is msg.sender");
 
         if (refferalToRefferer[msg.sender] == address(0) && refferer != address(0)) {
             refferalToRefferer[msg.sender] = refferer;
         }
 
         if (refferalToRefferer[msg.sender] != address(0)) {
-            // Business logic requires force sending, we know that it can fail. But we can't revert on failure to prevent DOS
-            // And also business don't want withdrawal pattern
-            payable(refferalToRefferer[msg.sender]).send(entranceFee * reffererShare / FLOOR);
+            // don't check return value because we should not revert on failure
+            (bool success,) = refferalToRefferer[msg.sender].call{value: entranceFee * reffererShare / FLOOR}("");
+            if (success) {
+                emit ReffererPaid(block.timestamp, refferalToRefferer[msg.sender], msg.sender, entranceFee, entranceFee * reffererShare / FLOOR);
+            }
         }
         
         --ticketsLeft;
