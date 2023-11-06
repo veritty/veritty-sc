@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/1a079d258b15409970f181702669fa8738d0edef/contracts/token/ERC721/ERC721.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/1a079d258b15409970f181702669fa8738d0edef/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/1a079d258b15409970f181702669fa8738d0edef/contracts/access/Ownable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/1a079d258b15409970f181702669fa8738d0edef/contracts/utils/Counters.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/1a079d258b15409970f181702669fa8738d0edef/contracts/utils/Strings.sol";
 
 contract Ticket is ERC721, Ownable {
     using Counters for Counters.Counter;
@@ -18,7 +18,7 @@ contract Ticket is ERC721, Ownable {
 
     string private baseUri = "https://veritty-backend-polygon-app.herokuapp.com/metadata/";
 
-    constructor(uint256[] memory _tokenIds, uint256[] memory _sums) ERC721("VERITTY - NFT LOTTERY", "VRT") {
+    constructor(uint256[] memory _tokenIds, uint256[] memory _sums) ERC721("VERITTY Ticket", "VRT") {
         require(_tokenIds.length == _sums.length, "Ticket: invalid arguments");
 
         uint256 length = _tokenIds.length;
