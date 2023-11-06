@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/1a079d258b15409970f181702669fa8738d0edef/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./Raffle.sol";
 import "./Ticket.sol";
@@ -12,7 +12,7 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 contract RaffleImpl is Ownable, Raffle, VRFConsumerBaseV2 {
     /* Raffle Variables */
     Ticket public immutable ticketNft;
-    uint256 public entranceFee = 55.0 ether;
+    uint256 public entranceFee = 0.14 ether;
     uint256 public ticketsLeft;
     uint256 private ticketsLeftToFulfill;
     uint256[] private amounts;
@@ -27,7 +27,7 @@ contract RaffleImpl is Ownable, Raffle, VRFConsumerBaseV2 {
     VRFCoordinatorV2Interface private vrfCoordinator;
     uint32 public constant numWords = 1;
     uint16 public immutable requestConfirmations;
-    uint32 public constant callbackGasLimit = 600000;
+    uint32 public callbackGasLimit = 600_000;
     bytes32 public keyHash;
     uint64 public subscriptionId;
     mapping (uint256 => address) public playerByRequestId;
@@ -67,8 +67,8 @@ contract RaffleImpl is Ownable, Raffle, VRFConsumerBaseV2 {
 
         amounts = _amounts;
 
-        ticketsLeft = 11999;
-        ticketsLeftToFulfill = 11999;
+        ticketsLeft = 120000;
+        ticketsLeftToFulfill = 120000;
 
         ticketNft = Ticket(_ticketNft);
     }
@@ -76,6 +76,10 @@ contract RaffleImpl is Ownable, Raffle, VRFConsumerBaseV2 {
     function setSubscriptionId(uint64 newId) external onlyOwner {
         require(newId != 0, "RaffleImpl: invalid arguments");
         subscriptionId = newId;
+    }
+
+    function setCallbackGasLimit(uint32 newGasLimit) external onlyOwner {
+        callbackGasLimit = newGasLimit;
     }
 
     function setKeyHash(bytes32 newKeyHash) external onlyOwner {
