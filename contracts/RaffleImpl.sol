@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/1a079d258b15409970f181702669fa8738d0edef/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts@4.9.3/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./Raffle.sol";
 import "./Ticket.sol";
